@@ -1,0 +1,55 @@
+#load_dataset 1
+
+load csv with headers from "file:///chat_create_team_chat.csv" as line
+
+merge (u:user{id:toInteger(line.user_id)})
+merge (m:team{id:toInteger(line.team_id)}) 
+merge(c:ChatSession{id:toInteger(line.assignmentId)}) 
+merge (u)-[:CreateSession{timestamp:line.date}]->(c) 
+merge (c)-[:RetainedBy{timestamp:line.date}]->(m);
+
+#Load_dataset 2
+
+load csv with headers from "file:///chat_item_team_chat.csv" as line 
+
+merge (u:user{id:toInteger(line.user_id)}) 
+merge (c:ChatSession{id:toInteger(line.click_id)})
+merge(t:ChatText{id:toInteger(line.tx_id)})
+merge (u)-[:WriteChat{timestamp:line.date}]->(t)
+merge (c)-[:ContainText{timestamp:line.date}]->(t);
+
+#Load_dataset 3
+
+load csv with headers from "file:///chat_join_team_chat.csv" as line
+
+merge (u:user{id:toInteger(line.user_id)}) 
+merge (c:ChatSession{id:toInteger(line.assignmentId)})
+merge (u)-[:Joins{timestamp:line.date}]->(c);
+
+#Load_dataset 4
+
+load csv with headers from "file:///chat_leave_team_chat.csv" as line
+
+merge (u:user{id:toInteger(line.user_id)}) 
+merge (c:ChatSession{id:toInteger(line.assignmentId)}) 
+merge (u)-[:Leaves{timestamp:line.date}]->(c);
+
+#load_dataset 5
+
+load csv with headers from "file:///chat_mention_team_chat.csv" as line
+
+merge (u:user{id:toInteger(line.user_id)}) 
+merge(t:ChatText{id:toInteger(line.tx_id)})  
+merge (u)-[:Mention {timestamp:line.date}]->(t);
+
+#load_dataset 6
+
+load csv with headers from "file:///chat_respond_team_chat.csv" as line
+
+merge (c:ChatSession{id:toInteger(line.assignmentId)})
+merge(t:ChatText{id:toInteger(line.tx_id)})  
+merge (c)-[:Respond {timestamp:line.date}]->(t);
+
+
+
+
